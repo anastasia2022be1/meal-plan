@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -22,4 +23,4 @@ model Profile {
   stripeSubscriptionId String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
+} 

@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     try {
         const { planType, userId, email } = await request.json();
 
-        if(!planType || !userId || !email) {
+        if (!planType || !userId || !email) {
             return NextResponse.json({ error: "Plan type, user id, and email are required" }, { status: 400 });
         }
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
             customer_email: email,
             metadata: {
                 clerkUserId: userId, 
-                planType
+                planType: planType
             },
             success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/subscribe`,

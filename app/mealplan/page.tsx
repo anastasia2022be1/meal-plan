@@ -1,4 +1,4 @@
-export default function MeakPlanDashboard() {
+export default function MealPlanDashboard() {
     return (
         <div>Meal Plan Page</div>
     )

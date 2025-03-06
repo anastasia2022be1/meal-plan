@@ -31,7 +31,9 @@ async function subscribeToPlan(
         const errorData: SubscribeError = await response.json();
         throw new Error(errorData.error || "Failed to subscribe");
     }
-    return response.json();
+
+    const data: SubscribeResponse = await response.json();
+    return data;
 }
 
 export default function Subscribe() {
@@ -39,9 +41,9 @@ export default function Subscribe() {
     const router = useRouter();
 
     const userId = user?.id;
-    const email = user?.emailAddresses[0]?.emailAddress || "";
+    const email = user?.emailAddresses[0].emailAddress || "";
 
-    const { mutate, isLoading } = useMutation<
+    const { mutate, isPending } = useMutation<
         SubscribeResponse,
         SubscribeError,
         { planType: string }
@@ -52,12 +54,15 @@ export default function Subscribe() {
             }
             return subscribeToPlan(planType, userId, email);
         },
+        onMutate: () => {
+            toast.loading("Subscribing...");
+        },
         onSuccess: (data) => {
             toast.success("Redirecting to checkout...");
             window.location.href = data.url;
         },
         onError: (error) => {
-            toast.error(error.message);
+            toast.error("Failed to subscribe");
         },
     });
 
@@ -124,10 +129,10 @@ export default function Subscribe() {
 
                         <button
                             onClick={() => handleSubscribe(plan.interval)}
-                            disabled={isLoading}
+                            disabled={isPending}
                             className="mt-auto bg-emerald-500 text-white font-medium py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors"
                         >
-                            {isLoading ? "Please wait..." : `Subscribe ${plan.name}`}
+                            {isPending ? "Please wait..." : `Subscribe ${plan.name}`}
                         </button>
                     </div>
                 ))}

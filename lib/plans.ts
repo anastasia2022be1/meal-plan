@@ -5,7 +5,7 @@ export interface Plan {
     amount: number,
     currency: string,
     interval: string,
-    isPopular: boolean,
+    isPopular?: boolean,
     description: string,
     features: string[]
 }
@@ -55,8 +55,8 @@ export const availiblePlans: Plan[] = [
             "Priority customer support",
             "Cancel anytime"
         ],
-    }
-]
+    },
+];
 
 const priceIdMap: Record<string, string> = {
     week: process.env.STRIPE_PRICE_WEEKLY!,

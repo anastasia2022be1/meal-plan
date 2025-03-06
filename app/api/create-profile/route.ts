@@ -5,15 +5,15 @@ import {prisma} from "@/lib/prisma";
 
 export async function POST() {
     try {
-        const clerkuser = await currentUser();
-        if(!clerkuser) {
+        const clerkUser = await currentUser();
+        if(!clerkUser) {
             return NextResponse.json({
                 error: "User not found in Clerk"},
                 { status: 404 }
             );
         }
     
-        const email =clerkuser?.emailAddresses[0].emailAddress;
+        const email =clerkUser.emailAddresses[0].emailAddress;
         if(!email) {
             return NextResponse.json(
                 { error: "User does not have an email adress" },
@@ -22,7 +22,7 @@ export async function POST() {
         }
     
         const existingProfile = await prisma.profile.findUnique({
-            where: {userId: clerkuser.id},
+            where: {userId: clerkUser.id},
         });
         if(existingProfile) {
             return NextResponse.json(
@@ -30,9 +30,9 @@ export async function POST() {
             );
         }
     
-        await prisma?.profile.create({
+        await prisma.profile.create({
             data: {
-                userId: clerkuser.id,
+                userId: clerkUser.id,
                 email,
                 subscriptionTier: null,
                 stripeSubscriptionId: null,
@@ -41,7 +41,8 @@ export async function POST() {
         });
     
         return NextResponse.json({ message: "Profile created successfully."}, { status: 201 });
-    } catch (error) {
+    } catch (error: any) {
+        console.error("Error creating profile:", error.message);
         return NextResponse.json({ error: "An error occurred while creating the profile."}, { status: 500 });
     }
 }
