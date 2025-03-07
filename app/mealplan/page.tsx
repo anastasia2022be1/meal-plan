@@ -1,14 +1,50 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
+import { Spinner } from "../components/spinner";
+
+interface MealPlanInput {
+    dietType: string;
+    calories: number;
+    allergies: string;
+    cuisine: string;
+    snacks: boolean;
+    days?: number;
+}
+
+interface DailyMealPlan {
+    Breakfast?: string;
+    Lunch?: string;
+    Dinner?: string;
+    Snacks?: string;
+}
+
+interface WeeklyMealPlan {
+    [day: string]: DailyMealPlan;
+}
+
+interface MealPlanResponse {
+    mealPlan?: WeeklyMealPlan;
+    error?: string;
+}
+
+async function generateMealPlan(payload: MealPlanInput) {
+    const response = await fetch("/api/generate-mealplan", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    return response.json();
+};
+
 export default function MealPlanDashboard() {
-    interface MealPlanInput {
-        dietType: string;
-        calories: number;
-        allergies: string;
-        cuisine: string;
-        snacks: boolean;
-        days?: number;
-    }
+
+    const { mutate, isPending, data, isSuccess } = useMutation<MealPlanResponse, Error, MealPlanInput>({
+        mutationFn: generateMealPlan,
+    });
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -17,14 +53,27 @@ export default function MealPlanDashboard() {
 
         const payload: MealPlanInput = {
             dietType: (formData.get("dietType") as string) || "",
-            calories: Number(formData.get("calories")) || 2000,
+            calories: Number(formData.get("calories")) ?? 2000,
             allergies: (formData.get("allergies") as string) || "",
             cuisine: (formData.get("cuisine") as string) || "",
             snacks: formData.get("snacks") === "on",
             days: 7,
         };
 
-        console.log(payload);
+        mutate(payload, {
+            onSuccess: (data) => {
+                console.log("Meal Plan Response:", data);
+            },
+            onError: (error) => {
+                console.error("Error generating meal plan:", error);
+            }
+        });
+        
+    }
+
+    if(data) {
+        console.log(data);
+        
     }
 
     return (
@@ -103,9 +152,10 @@ export default function MealPlanDashboard() {
                     <div>
                         <button
                             type="submit"
+                            disabled={isPending}
                             className="w-full bg-emerald-500 text-white font-medium py-2 px-4 rounded-md shadow-lg hover:bg-emerald-600 transition-all"
                         >
-                            Generate Meal Plan
+                           {isPending ? "Generating..." : "Generate Meal Plan"} 
                         </button>
                     </div>
                 </form>
@@ -113,6 +163,8 @@ export default function MealPlanDashboard() {
 
             <div className="mt-8 text-center">
                 <h2 className="text-2xl font-semibold text-gray-800">Weekly Meal Plan</h2>
+
+                {data?.mealPlan && isSuccess ? (<div></div>) : isPending ? (<Spinner />) : <p>Please generate a meal plan to see it here</p>}
             </div>
         </div>
     );
