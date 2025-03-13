@@ -10,13 +10,13 @@ export default function NavBar() {
     return null;
   }
   return (
-    <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Brand / Logo */}
         <Link href="/">
           <Image
-            className="text-xl font-bold text-emerald-700 cursor-pointer"
-            src="/logo.svg" 
+            className="cursor-pointer hover:opacity-80 transition-opacity"
+            src="/logo.svg"
             width={60}
             height={60}
             alt="Logo"
@@ -28,7 +28,7 @@ export default function NavBar() {
           <SignedIn>
             <Link
               href="/mealplan"
-              className="text-gray-700 hover:text-emerald-500 transition-colors"
+              className="text-gray-700 hover:text-emerald-500 font-medium transition-colors"
             >
               Mealplan
             </Link>
@@ -40,7 +40,7 @@ export default function NavBar() {
                   alt="Profile Picture"
                   width={40}
                   height={40}
-                  className="rounded-full"
+                  className="rounded-full border border-gray-300 shadow-sm hover:shadow-md transition"
                 />
               </Link>
             ) : (
@@ -49,7 +49,7 @@ export default function NavBar() {
             )}
             {/* Sign Out Button */}
             <SignOutButton>
-              <button className="ml-4 px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition">
+              <button className="ml-4 px-5 py-2 bg-emerald-500 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-600 transition-all">
                 Sign Out
               </button>
             </SignOutButton>
@@ -57,19 +57,19 @@ export default function NavBar() {
           <SignedOut>
             <Link
               href="/"
-              className="text-gray-700 hover:text-emerald-500 transition-colors"
+              className="text-gray-700 hover:text-emerald-500 font-medium transition-colors"
             >
               Home
             </Link>
             <Link
               href={isSignedIn ? "/subscribe" : "/sign-up"}
-              className="text-gray-700 hover:text-emerald-500 transition-colors"
+              className="text-gray-700 hover:text-emerald-500 font-medium transition-colors"
             >
               Subscribe
             </Link>
             <Link
               href="/sign-up"
-              className="px-4 py-2 bg-emerald-500 text-white rounded hover:bg-emerald-600 transition"
+              className="px-5 py-2 bg-emerald-500 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-600 transition-all"
             >
               Sign Up
             </Link>

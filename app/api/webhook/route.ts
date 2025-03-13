@@ -1,36 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { stripe } from "@/lib/stripe";
-import {prisma} from "@/lib/prisma";
+import { stripe } from "@/lib/stripe"; // Initialized Stripe client
+import { prisma } from "@/lib/prisma"; // ORM Prisma for database operations
 
+// Handler for POST request to process Stripe webhook events
 export async function POST(request: NextRequest) {
-    const body = await request.text(); // получает JSON-тело запроса
-    const signature = request.headers.get("stripe-signature"); // заголовок stripe-signature, который нужен для верификации подлинности события
+    const body = await request.text(); // Retrieves the JSON request body
+    const signature = request.headers.get("stripe-signature"); // Retrieves the Stripe signature header for verification
 
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!; // секретный ключ вебхука, который Stripe использует для подписи запросов
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!; // Secret key for verifying Stripe webhooks
 
     let event: Stripe.Event;
 
     try {
-       // console.log("Webhook received. Verifying event...");
-        event = stripe.webhooks.constructEvent(body, signature || "", webhookSecret); // проверяет, что запрос действительно пришел от Stripe и не был подделан.
-       // console.log("Webhook verified successfully:", event.type);
+        // Verifies that the request is legitimately from Stripe and has not been tampered with
+        event = stripe.webhooks.constructEvent(body, signature || "", webhookSecret);
     } catch (error) {
-      //  console.error("Error verifying webhook signature:", error.message);
         return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     try {
         switch (event.type) {
-            // Обработка успешного платежа
+            // Handle successful payment
             case "checkout.session.completed": {
                 const session = event.data.object as Stripe.Checkout.Session;
-              //  console.log("Checkout session completed:", session);
-                await handleCheckoutSessionCompleted(session); // Вызывается handleCheckoutSessionCompleted(session), которая обновляет данные пользователя в БД
+                await handleCheckoutSessionCompleted(session); // Calls function to update user data in the database
                 break;
             }
     
-            // Обработка неудачной оплаты счета
+            // Handle failed invoice payment
             case "invoice.payment_failed": {
                 const session = event.data.object as Stripe.Invoice;
                 console.log("Invoice payment failed:", session);
@@ -38,7 +36,7 @@ export async function POST(request: NextRequest) {
                 break;
             }
     
-            // Обработка отмены подписки
+            // Handle subscription cancellation
             case "customer.subscription.deleted": {   
                 const session = event.data.object as Stripe.Subscription;
                 console.log("Subscription deleted:", session);
@@ -57,18 +55,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({});
 }
 
-// обновляет данные пользователя
+// Updates user data after a successful checkout session
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
-    // console.log("Function handleCheckoutSessionCompleted started", session);
-
-    const userId = session.metadata?.clerkUserId; // обновляет данные пользователя
+    const userId = session.metadata?.clerkUserId; // Retrieves the user ID from session metadata
 
     if (!userId) {
         console.log("No user ID found in checkout session");
         return;
     }
 
-    const subscriptionId = session.subscription as string; // Проверяет наличие subscriptionId (ID подписки)
+    const subscriptionId = session.subscription as string; // Checks for the presence of a subscription ID
 
     if (!subscriptionId || subscriptionId === "") {
         console.log("No subscription ID found in checkout session");
@@ -85,9 +81,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         await prisma.profile.update({
             where: { userId },
             data: {
-                stripeSubscriptionId: subscriptionId, // сохраняет ID подписки
-                subscriptionActive: true, // помечает подписку как активную
-                subscriptionTier: session.metadata?.planType || null, // тип подписки
+                stripeSubscriptionId: subscriptionId, // Stores subscription ID
+                subscriptionActive: true, // Marks subscription as active
+                subscriptionTier: session.metadata?.planType || null, // Stores subscription type
             },
         });
 
@@ -98,7 +94,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     }
 }
 
-// обработкa неудачных оплат счета
+// Handles failed invoice payments
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     const subId = invoice.subscription as string;
 
@@ -108,21 +104,19 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 
     let userId: string | undefined;
     try {
-            // Ищем профиль пользователя в базе данных по его Stripe Subscription ID
+        // Searches for user profile in the database using the Stripe Subscription ID
         const profile = await prisma?.profile.findUnique({
-            where: { stripeSubscriptionId: subId }, // Условие поиска: ищем запись, где поле stripeSubscriptionId равно subId
-            select: { userId: true }, // Запрашиваем только поле userId, остальные данные не загружаем
+            where: { stripeSubscriptionId: subId }, // Finds record where stripeSubscriptionId matches subId
+            select: { userId: true }, // Retrieves only the userId field
         });
 
-        // Проверяем, найден ли профиль и есть ли у него userId
+        // Checks if a profile was found and has a userId
         if (!profile?.userId) { 
-            console.log("No user found for subscription ID:", subId); // Логируем сообщение, если пользователя не найдено
-            return; // Завершаем выполнение функции, если профиль не найден
+            console.log("No user found for subscription ID:", subId); // Logs message if user not found
+            return; // Exits function if no profile is found
         }
 
-        // Если профиль найден, присваиваем userId из объекта profile
         userId = profile?.userId;
-
     } catch (error:any) {
         console.log(error.message);
         return;
@@ -130,9 +124,9 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     
     try {
         await prisma?.profile.update({
-            where: { userId: userId }, // Условие поиска: ищем запись, где поле userId равно userId
+            where: { userId: userId }, // Finds record where userId matches
             data: {
-                subscriptionActive: false, // Помечаем подписку как неактивную
+                subscriptionActive: false, // Marks subscription as inactive
             },
         });
     } catch (error) {
@@ -140,27 +134,24 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     }
 }
 
-//  обработкa удаления подписки
+// Handles subscription cancellation
 async function handleCustomerSubscriptionDeleted(subscription: Stripe.Subscription) {
-
     const subId = subscription.id;
 
     try {
-            // Ищем профиль пользователя в базе данных по его Stripe Subscription ID
+        // Searches for user profile in the database using the Stripe Subscription ID
         const profile = await prisma?.profile.findUnique({
-            where: { stripeSubscriptionId: subId }, // Условие поиска: ищем запись, где поле stripeSubscriptionId равно subId
-            select: { userId: true }, // Запрашиваем только поле userId, остальные данные не загружаем
+            where: { stripeSubscriptionId: subId }, // Finds record where stripeSubscriptionId matches subId
+            select: { userId: true }, // Retrieves only the userId field
         });
 
-        // Проверяем, найден ли профиль и есть ли у него userId
+        // Checks if a profile was found and has a userId
         if (!profile?.userId) { 
-            console.log("No user found for subscription ID:", subId); // Логируем сообщение, если пользователя не найдено
-            return; // Завершаем выполнение функции, если профиль не найден
+            console.log("No user found for subscription ID:", subId); // Logs message if user not found
+            return; // Exits function if no profile is found
         }
 
-        // Если профиль найден, присваиваем userId из объекта profile
         userId = profile?.userId;
-
     } catch (error:any) {
         console.log(error.message);
         return;
@@ -168,11 +159,11 @@ async function handleCustomerSubscriptionDeleted(subscription: Stripe.Subscripti
     
     try {
         await prisma?.profile.update({
-            where: { userId: userId }, // Условие поиска: ищем запись, где поле userId равно userId
+            where: { userId: userId }, // Finds record where userId matches
             data: {
-                subscriptionActive: false, // Помечаем подписку как неактивную
-                stripeSubscriptionId: null, // Удаляем ID подписки
-                subscriptionTier: null, // Удаляем тип подписки
+                subscriptionActive: false, // Marks subscription as inactive
+                stripeSubscriptionId: null, // Removes subscription ID
+                subscriptionTier: null, // Removes subscription type
             },
         });
     } catch (error) {

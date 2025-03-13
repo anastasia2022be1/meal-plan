@@ -76,41 +76,39 @@ export default function Subscribe() {
     }
 
     return (
-        <div className="px-4 py-8 sm:py-12 lg:py-16 max-w-7xl mx-auto">
+        <div className="px-6 py-12 sm:py-16 lg:py-20 max-w-6xl mx-auto">
             <Toaster />
-            <div className="text-center mb-12">
-                <h2 className="text-3xl font-semibold">Pricing</h2>
-                <p className="mt-2 text-gray-600">
+            <div className="text-center mb-14">
+                <h2 className="text-4xl font-semibold text-gray-800">Pricing</h2>
+                <p className="mt-3 text-lg text-gray-600">
                     Get started on our weekly plan or upgrade to monthly or yearly when you are
                     ready
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 {availiblePlans.map((plan, key) => (
                     <div
                         key={key}
-                        className="relative flex flex-col justify-between p-6 bg-white rounded-lg shadow-md border border-gray-200 h-full"
-                    >
+                        className="relative flex flex-col justify-between p-8 bg-white rounded-xl shadow-lg border border-gray-300 h-full hover:shadow-xl transition-shadow">
                         {plan.isPopular && (
-                            <span className="absolute -top-3 -right-3 bg-emerald-500 text-white px-3 py-1 rounded-full text-xs shadow-lg">
+                            <span className="absolute -top-3 -right-3 bg-emerald-600 text-white px-4 py-1 rounded-full text-xs shadow-md">
                                 Most Popular
                             </span>
                         )}
 
-                        <h3 className="text-xl font-semibold text-gray-900">{plan.name}</h3>
-                        <p className="text-gray-600">
-                            <span className="text-2xl font-bold">{plan.amount}</span>{" "}
-                            {plan.currency} per {plan.interval}
+                        <h3 className="text-2xl font-semibold text-gray-900 mb-3">{plan.name}</h3>
+                        <p className="text-gray-700 text-lg">
+                            <span className="text-3xl font-bold">{plan.amount}</span> {plan.currency} per {plan.interval}
                         </p>
-                        <p className="text-gray-500">{plan.description}</p>
+                        <p className="text-gray-500 text-sm mt-2">{plan.description}</p>
 
-                        <ul className="mt-4 space-y-2 flex-grow">
+                        <ul className="mt-6 space-y-3 flex-grow">
                             {plan.features.map((feature, key) => (
-                                <li key={key} className="flex items-center text-gray-700">
+                                <li key={key} className="flex items-center text-gray-800 text-sm">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
-                                        className="w-5 h-5 text-emerald-500 mr-2"
+                                        className="w-5 h-5 text-emerald-600 mr-2"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -130,9 +128,8 @@ export default function Subscribe() {
                         <button
                             onClick={() => handleSubscribe(plan.interval)}
                             disabled={isPending}
-                            className="mt-auto bg-emerald-500 text-white font-medium py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors"
-                        >
-                            {isPending ? "Please wait..." : `Subscribe ${plan.name}`}
+                            className="mt-6 bg-emerald-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-emerald-700 transition-colors shadow-md w-full">
+                            {isPending ? "Please wait..." : `Subscribe to ${plan.name}`}
                         </button>
                     </div>
                 ))}

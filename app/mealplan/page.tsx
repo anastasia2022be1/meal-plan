@@ -92,9 +92,9 @@ export default function MealPlanDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-row items-start justify-center bg-gray-100 py-10 px-4 gap-6">
-      <div className="w-1/3 bg-green-500 text-white rounded-lg shadow-lg p-6">
-        <h1 className="text-3xl font-bold text-center mb-6">
+    <div className="min-h-screen flex flex-col md:flex-row items-start justify-center bg-gray-100 py-12 px-6 gap-8">
+      <div className="w-full md:w-1/3 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white rounded-xl shadow-xl p-8">
+        <h1 className="text-4xl font-bold text-center mb-6">
           AI Meal Plan Generator
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -103,56 +103,56 @@ export default function MealPlanDashboard() {
             id="dietType"
             name="dietType"
             placeholder="Diet Type"
-            className="w-full px-4 py-2 border rounded-md text-black"
+            className="w-full px-4 py-3 border rounded-lg text-black focus:ring-2 focus:ring-emerald-300"
           />
           <input
             type="number"
             id="calories"
             name="calories"
             placeholder="Daily Calorie Goal"
-            className="w-full px-4 py-2 border rounded-md text-black"
+            className="w-full px-4 py-3 border rounded-lg text-black focus:ring-2 focus:ring-emerald-300"
           />
           <input
             type="text"
             id="allergies"
             name="allergies"
             placeholder="Allergies"
-            className="w-full px-4 py-2 border rounded-md text-black"
+            className="w-full px-4 py-3 border rounded-lg text-black focus:ring-2 focus:ring-emerald-300"
           />
           <input
             type="text"
             id="cuisine"
             name="cuisine"
             placeholder="Preferred Cuisine"
-            className="w-full px-4 py-2 border rounded-md text-black"
+            className="w-full px-4 py-3 border rounded-lg text-black focus:ring-2 focus:ring-emerald-300"
           />
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3">
             <input
               type="checkbox"
               id="snacks"
               name="snacks"
-              className="h-5 w-5"
+              className="h-5 w-5 accent-emerald-500"
             />
-            <label htmlFor="snacks">Include Snacks</label>
+            <label htmlFor="snacks" className="text-lg">Include Snacks</label>
           </div>
           <button
             type="submit"
-            className="w-full bg-white text-green-500 font-medium py-2 px-4 rounded-md shadow-lg hover:bg-gray-200 transition-all">
+            className="w-full bg-white text-emerald-600 font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-200 transition-all">
             {isPending ? "Generating..." : "Generate Meal Plan"}
           </button>
         </form>
       </div>
-      <div className="w-2/3 bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+      <div className="w-full md:w-2/3 bg-white rounded-xl shadow-xl p-8">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-6">
           Weekly Meal Plan
         </h2>
         {isPending ? (
           <Spinner />
         ) : data?.mealPlan ? (
           Object.entries(data.mealPlan).map(([day, meals]) => (
-            <div key={day} className="mb-4 p-4 border rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold text-gray-800">{day}</h3>
-              <ul className="list-disc list-inside">
+            <div key={day} className="mb-6 p-6 border rounded-xl bg-gray-50 shadow-md">
+              <h3 className="text-2xl font-semibold text-gray-800">{day}</h3>
+              <ul className="list-disc list-inside text-lg text-gray-700 mt-2">
                 {meals.Breakfast && (
                   <li>
                     <strong>Breakfast:</strong> {meals.Breakfast}
@@ -177,7 +177,7 @@ export default function MealPlanDashboard() {
             </div>
           ))
         ) : (
-          <p>Please generate a meal plan to see results.</p>
+          <p className="text-lg text-gray-600">Please generate a meal plan to see results.</p>
         )}
       </div>
     </div>

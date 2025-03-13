@@ -1,46 +1,44 @@
 "use client";
 
-import { useState } from "react";
 import { SignIn, SignUp } from "@clerk/nextjs";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="px-4 py-8 sm:py-12 lg:py-16 max-w-7xl mx-auto">
+    <div className="px-6 py-10 sm:py-16 lg:py-20 max-w-6xl mx-auto">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white rounded-lg mb-12 p-8 text-center">
-        <h1 className="text-4xl font-bold mb-4">Personalized AI Meal Plans</h1>
-        <p className="text-xl mb-6">
+      <section className="bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-xl mb-14 p-10 text-center shadow-lg">
+        <h1 className="text-5xl font-bold mb-6">Personalized AI Meal Plans</h1>
+        <p className="text-xl mb-8">
           Let our AI do the planning. You focus on cooking and enjoying!
         </p>
         <Link
           href="/sign-up"
-          className="inline-block bg-white text-emerald-500 font-medium px-5 py-3 rounded hover:bg-gray-100 transition-colors">
+          className="inline-block bg-white text-emerald-600 font-semibold px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors shadow-md">
           Get Started
         </Link>
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="mb-12">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-semibold">How It Works</h2>
-          <p className="mt-2 text-gray-600">
+      <section id="how-it-works" className="mb-14">
+        <div className="text-center mb-10">
+          <h2 className="text-4xl font-semibold text-gray-800">How It Works</h2>
+          <p className="mt-3 text-lg text-gray-600">
             Follow these simple steps to get your personalized meal plan
           </p>
         </div>
-        <div className="flex flex-col md:flex-row justify-center items-start space-y-8 md:space-y-0 md:space-x-8">
+        <div className="flex flex-col md:flex-row justify-center items-start space-y-10 md:space-y-0 md:space-x-10">
           {/* Step 1 */}
-          <div className="flex flex-col items-center">
-            <div className="bg-emerald-500 text-white rounded-full h-16 w-16 flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center text-center max-w-xs">
+            <div className="bg-emerald-600 text-white rounded-full h-20 w-20 flex items-center justify-center mb-5 shadow-md">
               {/* Icon for Step 1 */}
-
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth="1.5"
                 stroke="currentColor"
-                className="size-6">
+                className="h-8 w-8">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -48,15 +46,15 @@ export default function Home() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-medium mb-2">Create an Account</h3>
-            <p className="text-center text-gray-600">
+            <h3 className="text-2xl font-medium mb-3 text-gray-800">Create an Account</h3>
+            <p className="text-lg text-gray-600">
               Sign up or sign in to access your personalized meal plans.
             </p>
           </div>
 
           {/* Step 2 */}
-          <div className="flex flex-col items-center">
-            <div className="bg-emerald-500 text-white rounded-full h-16 w-16 flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center text-center max-w-xs">
+            <div className="bg-emerald-600 text-white rounded-full h-20 w-20 flex items-center justify-center mb-5 shadow-md">
               {/* Icon for Step 2 */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +62,7 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth="1.5"
                 stroke="currentColor"
-                className="size-6">
+                className="h-8 w-8">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -72,16 +70,16 @@ export default function Home() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-medium mb-2">Set Your Preferences</h3>
-            <p className="text-center text-gray-600">
+            <h3 className="text-2xl font-medium mb-3 text-gray-800">Set Your Preferences</h3>
+            <p className="text-lg text-gray-600">
               Input your dietary preferences and goals to tailor your meal
               plans.
             </p>
           </div>
 
           {/* Step 3 */}
-          <div className="flex flex-col items-center">
-            <div className="bg-emerald-500 text-white rounded-full h-16 w-16 flex items-center justify-center mb-4">
+          <div className="flex flex-col items-center text-center max-w-xs">
+            <div className="bg-emerald-600 text-white rounded-full h-20 w-20 flex items-center justify-center mb-5 shadow-md">
               {/* Icon for Step 3 */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -97,8 +95,8 @@ export default function Home() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-medium mb-2">Receive Your Meal Plan</h3>
-            <p className="text-center text-gray-600">
+            <h3 className="text-2xl font-medium mb-3 text-gray-800">Receive Your Meal Plan</h3>
+            <p className="text-lg text-gray-600">
               Get your customized meal plan delivered weekly to your account.
             </p>
           </div>

@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { OpenAI } from "openai";
+import { OpenAI } from "openai"; // Import OpenAI SDK for AI processing
 
+// Create an OpenAI instance with API settings
 const openAI = new OpenAI({
-    apiKey: process.env.OPEN_ROUTER_API_KEY,
-    baseURL: "https://openrouter.ai/api/v1",
-})
+    apiKey: process.env.OPEN_ROUTER_API_KEY, // API key for accessing OpenRouter (stored in environment variables)
+    baseURL: "https://openrouter.ai/api/v1", // Base URL for OpenRouter API
+});
 
-
+// Handler for POST request to generate a meal plan
 export async function POST(request: NextRequest) {
     try {
+        // Extract parameters from the request body
         const { dietType, calories, allergies, cuisine, snacks, days } = await request.json();
 
+        // Create a prompt for AI
         const prompt = `
          You are a professional nutritionist. Create a ${days}-day meal plan for an individual following a ${dietType} diet aiming for ${calories} calories per day.
       
@@ -46,42 +49,50 @@ export async function POST(request: NextRequest) {
 
       Return just the json with no extra commentaries and no backticks. `;
 
+        // Send a request to OpenAI to generate a meal plan
         const response = await openAI.chat.completions.create({
-            model: "meta-llama/llama-3.3-70b-instruct:free",
+            model: "meta-llama/llama-3.3-70b-instruct:free", // AI model used
             messages: [
                 {
-                    role: "user",
-                    content: prompt,
+                    role: "user", // Define that the request is from a user
+                    content: prompt, // Pass the generated prompt
                 },
             ],
-            temperature: 0.7,
-            max_tokens: 1500,
+            temperature: 0.7, // Define randomness in AI responses
+            max_tokens: 1500, // Limit the number of tokens in the response
         });
 
+        // Retrieve AI-generated JSON response and trim unnecessary spaces
         const aiContent = response.choices[0].message.content!.trim();
 
-        let parsedMealPlan: {[day: string]: DailyMealPlan};
+        let parsedMealPlan: { [day: string]: DailyMealPlan };
 
         try {
+            // Parse JSON response from OpenAI into a JavaScript object
             parsedMealPlan = JSON.parse(aiContent);
         } catch (parseError: any) {
             console.error("Failed to parse meal plan: ", parseError);
             return NextResponse.json({ error: "Failed to parse meal plan. Please try again"}, {status: 500});
         }
 
-        if(typeof parsedMealPlan !== "object" || parsedMealPlan === null) {
+        // Ensure the parsed response is a valid object
+        if (typeof parsedMealPlan !== "object" || parsedMealPlan === null) {
             return NextResponse.json({ error: "Invalid meal plan format"}, {status: 500});
         }
 
+        // Return a successful JSON response with the meal plan
         return NextResponse.json({ mealPlan: parsedMealPlan });
-    } catch (error:any) {
+
+    } catch (error: any) {
+        // Return a 500 Internal Server Error response in case of failure
         return NextResponse.json({ error: "Failed to generate meal plan"}, {status: 500});
     }
 }
 
+// Define the interface for the meal plan structure
 interface DailyMealPlan {
-    Breakfast?: string;
+    Breakfast?: string; 
     Lunch?: string;
-    Dinner?: string;
-    Snacks?: string;
+    Dinner?: string; 
+    Snacks?: string; 
 }
