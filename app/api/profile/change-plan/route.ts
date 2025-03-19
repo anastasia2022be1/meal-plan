@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
       { subscription: updatedSubscription },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error) {
     // Log the error to the console
     console.error("API Error:", error);
     

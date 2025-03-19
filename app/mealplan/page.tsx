@@ -41,7 +41,7 @@ async function generateMealPlan(payload: MealPlanInput) {
 }
 
 export default function MealPlanDashboard() {
-  const { mutate, isPending, data, isSuccess } = useMutation<
+  const { mutate, isPending, data } = useMutation<
     MealPlanResponse,
     Error,
     MealPlanInput
@@ -73,23 +73,23 @@ export default function MealPlanDashboard() {
     });
   }
 
-  const daysOfTheWeek = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
+  // const daysOfTheWeek = [
+  //   "Monday",
+  //   "Tuesday",
+  //   "Wednesday",
+  //   "Thursday",
+  //   "Friday",
+  //   "Saturday",
+  //   "Sunday",
+  // ];
 
-  const getMealPlanForDay = (day: string): DailyMealPlan | undefined => {
-    if (!data?.mealPlan) {
-      return undefined;
-    }
+  // const getMealPlanForDay = (day: string): DailyMealPlan | undefined => {
+  //   if (!data?.mealPlan) {
+  //     return undefined;
+  //   }
 
-    return data?.mealPlan[day];
-  };
+  //   return data?.mealPlan[day];
+  // };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-start justify-center bg-gray-100 py-12 px-6 gap-8">

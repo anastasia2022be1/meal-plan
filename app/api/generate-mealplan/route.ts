@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         try {
             // Parse JSON response from OpenAI into a JavaScript object
             parsedMealPlan = JSON.parse(aiContent);
-        } catch (parseError: any) {
+        } catch (parseError) {
             console.error("Failed to parse meal plan: ", parseError);
             return NextResponse.json({ error: "Failed to parse meal plan. Please try again"}, {status: 500});
         }
@@ -83,7 +83,8 @@ export async function POST(request: NextRequest) {
         // Return a successful JSON response with the meal plan
         return NextResponse.json({ mealPlan: parsedMealPlan });
 
-    } catch (error: any) {
+    } catch (error) {
+        console.error(error);
         // Return a 500 Internal Server Error response in case of failure
         return NextResponse.json({ error: "Failed to generate meal plan"}, {status: 500});
     }

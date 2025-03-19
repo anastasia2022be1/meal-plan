@@ -62,6 +62,7 @@ export default function Subscribe() {
             window.location.href = data.url;
         },
         onError: (error) => {
+            console.error(error);
             toast.error("Failed to subscribe");
         },
     });

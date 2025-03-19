@@ -30,7 +30,7 @@ export async function GET() {
 
     // Return a successful response with subscription information
     return NextResponse.json({ subscription: profile }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     // Log the error to the console
     console.error("API Error:", error);
     

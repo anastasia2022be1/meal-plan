@@ -51,9 +51,9 @@ export async function POST() {
             { message: "Profile created successfully." },
             { status: 201 }
         );
-    } catch (error: any) {
+    } catch (error) {
         // Log and return an error response in case of a failure
-        console.error("Error creating profile:", error.message);
+        console.error("Error creating profile:", error);
         return NextResponse.json(
             { error: "An error occurred while creating the profile." },
             { status: 500 }

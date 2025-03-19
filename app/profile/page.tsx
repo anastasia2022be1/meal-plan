@@ -64,7 +64,7 @@ export default function Profile() {
   });
 
   const {
-    data: updatedPlan,
+    // data: updatedPlan,
     mutate: updatePlanMutation,
     isPending: isUpdatePlanPending,
   } = useMutation({
@@ -75,12 +75,13 @@ export default function Profile() {
       refetch();
     },
     onError: (error) => {
+      console.error(error);
       toast.error("Failed to update plan");
     },
   });
 
   const {
-    data: canceledPlan,
+    // data: canceledPlan,
     mutate: unsubscribeMutation,
     isPending: isUnsubscribePending,
   } = useMutation({
@@ -90,6 +91,7 @@ export default function Profile() {
       router.push("/subscribe");
     },
     onError: (error) => {
+      console.error(error);
       toast.error("Failed to unsubscribe");
     },
   });

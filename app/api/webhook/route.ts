@@ -47,9 +47,9 @@ export async function POST(request: NextRequest) {
             default:
                 console.log("Unhandled event type:", event.type);
         }
-    } catch (error: any) {
-        console.error("Error processing webhook event:", error.message);
-        return NextResponse.json({ error: error.message }, { status: 400 });
+    } catch (error) {
+        console.error("Error processing webhook event:", error);
+        return NextResponse.json({ error: error }, { status: 400 });
     }
 
     return NextResponse.json({});
@@ -88,9 +88,8 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         });
 
         console.log("Function handleCheckoutSessionCompleted finished");
-    } catch (error: any) {
-        console.error("Error updating user profile:", error.message);
-        console.error(error.stack); 
+    } catch (error) {
+        console.error("Error updating user profile:", error);
     }
 }
 
@@ -117,8 +116,8 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
         }
 
         userId = profile?.userId;
-    } catch (error:any) {
-        console.log(error.message);
+    } catch (error) {
+        console.error(error);
         return;
     }
     
@@ -152,8 +151,8 @@ async function handleCustomerSubscriptionDeleted(subscription: Stripe.Subscripti
         }
 
         userId = profile?.userId;
-    } catch (error:any) {
-        console.log(error.message);
+    } catch (error) {
+        console.error(error);
         return;
     }
     

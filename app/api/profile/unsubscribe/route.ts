@@ -1,10 +1,10 @@
 import { currentUser } from "@clerk/nextjs/server"; // Retrieve the current user from Clerk
-import { NextRequest, NextResponse } from "next/server"; // Next.js API modules for handling requests
+import { NextResponse } from "next/server"; // Next.js API modules for handling requests
 import { prisma } from "@/lib/prisma"; // ORM Prisma for database operations
 import { stripe } from "@/lib/stripe"; // Initialized Stripe client
 
 // POST request handler for canceling a subscription
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Retrieve the current user from Clerk
     const clerkUser = await currentUser();
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       { subscription: canceledSubscription },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error) {
     // Log the error to the console
     console.error("API Error:", error);
 

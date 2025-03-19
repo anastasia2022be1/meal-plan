@@ -45,7 +45,8 @@ export default clerkMiddleware(async (auth, req) => {
         return NextResponse.redirect(new URL("/subscribe", origin
         ));
       }
-    } catch (error: any) {
+    } catch (error) {
+      console.error(error);
       return NextResponse.redirect(new URL("/subscribe", origin
       ));
     }
