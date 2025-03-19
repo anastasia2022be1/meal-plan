@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
 
    } catch (error) {
     // Return a 500 Internal Server Error response in case of an exception
-    return new Response(error.message, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return new Response(errorMessage, { status: 500 });
    }
 }

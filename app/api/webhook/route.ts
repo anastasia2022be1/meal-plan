@@ -16,7 +16,9 @@ export async function POST(request: NextRequest) {
         // Verifies that the request is legitimately from Stripe and has not been tampered with
         event = stripe.webhooks.constructEvent(body, signature || "", webhookSecret);
     } catch (error) {
-        return NextResponse.json({ error: error.message }, { status: 400 });
+        console.error("Stripe webhook error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
     try {
@@ -49,7 +51,8 @@ export async function POST(request: NextRequest) {
         }
     } catch (error) {
         console.error("Error processing webhook event:", error);
-        return NextResponse.json({ error: error }, { status: 400 });
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
     return NextResponse.json({});
@@ -60,23 +63,25 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     const userId = session.metadata?.clerkUserId; // Retrieves the user ID from session metadata
 
     if (!userId) {
-        console.log("No user ID found in checkout session");
+        console.warn("No user ID found in checkout session");
         return;
     }
 
     const subscriptionId = session.subscription as string; // Checks for the presence of a subscription ID
 
     if (!subscriptionId || subscriptionId === "") {
-        console.log("No subscription ID found in checkout session");
+        console.warn("No subscription ID found in checkout session");
         return;
     }
 
     try {
-        console.log("Updating profile with userId:", userId, "and subscriptionId:", subscriptionId);
-        const userProfile = await prisma.profile.findUnique({
-            where: { userId }
-        });
-        console.log("Found profile:", userProfile);
+        console.log(`Updating profile for userId: ${userId}, subscriptionId: ${subscriptionId}`);
+
+        // const userProfile = await prisma.profile.findUnique({
+        //     where: { userId }
+        // });
+
+        // console.log("Found profile:", userProfile);
         
         await prisma.profile.update({
             where: { userId },
@@ -95,77 +100,86 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 
 // Handles failed invoice payments
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
-    const subId = invoice.subscription as string;
+    const subscriptionId = invoice.subscription as string;
+    if (!subscriptionId) return;
 
-    if(!subId) {
-        return;
-    }
-
-    let userId: string | undefined;
+   // let userId: string | undefined;
     try {
         // Searches for user profile in the database using the Stripe Subscription ID
-        const profile = await prisma?.profile.findUnique({
-            where: { stripeSubscriptionId: subId }, // Finds record where stripeSubscriptionId matches subId
+        const profile = await prisma.profile.findUnique({
+            where: { stripeSubscriptionId: subscriptionId }, // Finds record where stripeSubscriptionId matches subId
             select: { userId: true }, // Retrieves only the userId field
         });
 
-        // Checks if a profile was found and has a userId
-        if (!profile?.userId) { 
-            console.log("No user found for subscription ID:", subId); // Logs message if user not found
-            return; // Exits function if no profile is found
+        if (!profile) {
+            console.warn(`No user found for subscription ID: ${subscriptionId}`);
+            return;
         }
 
-        userId = profile?.userId;
-    } catch (error) {
-        console.error(error);
-        return;
-    }
+        // // Checks if a profile was found and has a userId
+        // if (!profile?.userId) { 
+        //     console.log("No user found for subscription ID:", subscriptionId); // Logs message if user not found
+        //     return; // Exits function if no profile is found
+        // }
+
+        // userId = profile?.userId;
+    // } catch (error) {
+    //     console.error(error);
+    //     return;
+    // }
     
-    try {
+    // try {
         await prisma?.profile.update({
-            where: { userId: userId }, // Finds record where userId matches
+            where: { userId: profile.userId }, // Finds record where userId matches
             data: {
                 subscriptionActive: false, // Marks subscription as inactive
             },
         });
     } catch (error) {
-        console.log(error.message);
+        console.error("Error handling failed payment:", error);
     }
 }
 
 // Handles subscription cancellation
 async function handleCustomerSubscriptionDeleted(subscription: Stripe.Subscription) {
-    const subId = subscription.id;
+    const subscriptionId = subscription.id;
+    if (!subscriptionId) return;
 
     try {
         // Searches for user profile in the database using the Stripe Subscription ID
-        const profile = await prisma?.profile.findUnique({
-            where: { stripeSubscriptionId: subId }, // Finds record where stripeSubscriptionId matches subId
+        const profile = await prisma.profile.findUnique({
+            where: { stripeSubscriptionId: subscriptionId }, // Finds record where stripeSubscriptionId matches subId
             select: { userId: true }, // Retrieves only the userId field
         });
 
-        // Checks if a profile was found and has a userId
-        if (!profile?.userId) { 
-            console.log("No user found for subscription ID:", subId); // Logs message if user not found
-            return; // Exits function if no profile is found
+        if (!profile) {
+            console.warn(`No user found for subscription ID: ${subscriptionId}`);
+            return;
         }
 
-        userId = profile?.userId;
-    } catch (error) {
-        console.error(error);
-        return;
-    }
+    //     // Checks if a profile was found and has a userId
+    //     if (!profile?.userId) { 
+    //         console.log("No user found for subscription ID:", subId); // Logs message if user not found
+    //         return; // Exits function if no profile is found
+    //     }
+
+    //     userId = profile?.userId;
+    // } catch (error) {
+    //     console.warn(`No user found for subscription ID: ${subscriptionId}`);
+    //     return;
+    // }
     
-    try {
+    // try {
         await prisma?.profile.update({
-            where: { userId: userId }, // Finds record where userId matches
+            where: { userId: profile.userId }, // Finds record where userId matches
             data: {
                 subscriptionActive: false, // Marks subscription as inactive
                 stripeSubscriptionId: null, // Removes subscription ID
                 subscriptionTier: null, // Removes subscription type
             },
         });
+        console.log(`Subscription for user ${profile.userId} canceled.`);
     } catch (error) {
-        console.log(error.message);
+        console.error("Error handling subscription cancellation:", error);
     }
 }
